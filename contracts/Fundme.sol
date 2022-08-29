@@ -22,18 +22,25 @@ contract FundMe {
     address[] public funders;
     mapping(address => uint256) public addressToAmountFunded;
 
-    address public immutable i_owner;
+    address public immutable owner;
 
     // 21,508 gas - immutable
     // 23,644 - non immutable
 
-    constructor() {
-        i_owner = msg.sender;
+    AggregatorV3Interface private priceFeed; 
+ 
+    constructor(address priceFeedAddress) {
+        owner = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
+
+    // constructor() {
+    //     i_owner = msg.sender;
+    // }
 
     function fund() public payable {
         require(
-            msg.value.getConversionRate() >= MINIMUM_USD,
+            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
             "Didn't send enough!"
         );
         funders.push(msg.sender);
@@ -73,7 +80,7 @@ contract FundMe {
 
     modifier onlyOwner() {
         // require(msg.sender == i_owner, "Sender is not owner!");
-        if(msg.sender == i_owner) {revert NotOwner();}
+        if(msg.sender == owner) {revert NotOwner();}
         // doing the rest of the code
         _;
     }

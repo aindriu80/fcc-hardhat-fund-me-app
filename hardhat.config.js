@@ -8,26 +8,27 @@ require("hardhat-deploy")
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.8",
-  networks:{
-    ropsten:{
-      url:process.env.ROPSTEN_URL || "",
-      accounts:[],
+    solidity: "0.8.8",
+    defaultNetwork: "hardhat",
+    networks: {
+        ropsten: {
+            url: process.env.ROPSTEN_URL || "",
+            accounts: []
+        }
     },
-  },
-  gasReporter:{
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-  },
-  etherscan:{
-    apiKey: process.env.EtherscanAPI_KEY,
-  },
-  namedAcccounts:{
-    deployer:{
-      default: 0,
+    gasReporter: {
+        enabled: process.env.REPORT_GAS !== undefined,
+        currency: "USD"
     },
-    users:{
-      default:1,
+    etherscan: {
+        apiKey: process.env.EtherscanAPI_KEY
+    },
+    namedAcccounts: {
+        deployer: {
+            default: 0
+        },
+        users: {
+            default: 1
+        }
     }
-  }
-};
+}
