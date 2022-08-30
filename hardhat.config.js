@@ -8,7 +8,11 @@ require("hardhat-deploy")
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-    solidity: "0.8.8",
+    // solidity: "0.8.8",
+    solidity: {
+        compilers: [{ version: "0.8.8" }, { version: "0.6.6" }]
+    },
+
     defaultNetwork: "hardhat",
     networks: {
         ropsten: {
@@ -23,7 +27,7 @@ module.exports = {
     etherscan: {
         apiKey: process.env.EtherscanAPI_KEY
     },
-    namedAcccounts: {
+    namedAccounts: {
         deployer: {
             default: 0
         },

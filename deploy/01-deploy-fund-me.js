@@ -1,31 +1,43 @@
-// import
+// const helperConfig = require("../helper-hardhat-config")
+// const networkConfig = helperConfig.networkConfig
+const { networkConfig } = require("../helper-hardhat-config")
+const { network } = require("hardhat")
+const {
+    developmentChains,
+    DECIMALS,
+    INITIAL_ANSWER
+} = require("../helper-hardhat-config")
 
-//main function
+module.exports = async ({ getNamedAccounts, deployments }) => {
+    console.log("Hello from the initial deploy function - different syntax")
+    const { deploy, log } = deployments
+    const { deployer } = await getNamedAccounts()
+    const chainId = network.config.chainId
 
-// calling of main function
+    // const address = ""
+    // if chainID is X use Address Y
+    // if chainID is Y use Address A
+    // const ethUsdPriceFeed = network.config[chainId]["ethUsdPriceFeed"]
 
-// function deployFunc(hre){
-// 	hre.getNamedAccounts()
-// 	hre.deployments
-// 	console.log("Hello from the initial deploy function")
-// }
-// module.exports.default = deployFunc
+    let ethUsdPriceFeedAddress
+    if (developmentChains.includes(network.name)) {
+        const ethUsdAggregator = await deployments.get("MockV3Aggregator")
+        ethUsdPriceFeedAddress = ethUsdAggregator.address
+    } else {
+        ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
+    }
 
-module.exports  = async ({getNamedAccounts, deployments}) => {
-                                                                 console.log(
-                                                                     "Hello from the initial deploy function - different syntax"
-                                                                 )
-                                                                 const {
-                                                                     deploy,
-                                                                     log
-                                                                 } = deployments
-                                                                 const {
-                                                                     deployer
-                                                                 } = await getNamedAccounts()
-                                                                 const chainId =
-                                                                     network
-                                                                         .config
-                                                                         .chainId
+    // if the contract doesn't exist, we deploy a minimal version of
+    // for our local sharing.
 
-                                                                 // when going for localhost or hardhat network we need to use a mock
-                                                             }
+    // when going for localhost or hardhat network we need to use a mock
+    const fundMe = await deploy("FundMe", {
+        from: deployer,
+        args: [ethUsdPriceFeedAddress], // put price feed address
+        log: true
+    })
+    log(
+        "-----------------------------------------------------------------------------------"
+    )
+}
+module.exports.tags = ["ethUsdPriceFeedAddress"]
