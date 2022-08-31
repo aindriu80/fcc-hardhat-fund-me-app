@@ -36,7 +36,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const fundMe = await deploy("FundMe", {
         from: deployer,
         args: args, // put price feed address
-        log: true
+        log: true,
+        waitConfirmations: network.config.blockConfirmations || 1
     })
     if (
         !developmentChains.includes(network.name) &&
