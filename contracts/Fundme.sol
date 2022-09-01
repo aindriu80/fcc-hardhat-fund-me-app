@@ -1,15 +1,22 @@
-// Get funds from users
-// Withdraw funds
-// Set a minimum funding value in USD
-
 // SPDX-Licence-Identifier: MIT
-pragma solidity ^0.8.0;
-
+// Pragma
+pragma solidity ^0.8.8;
+// Imports
 import "./PriceConverter.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-error NotOwner();
+// Error codes
+error FundMe__NotOwner();
 
+//  Interfaces, Libraries, Contracts
+
+/** @title A contract for crowd funding
+ *  @author Aindriú Mac Giolla Eoin
+ *  @notice This contract is to demo a sample funding contract
+ *  @dev This implements price feeds as our library
+ */
 contract FundMe {
+    // Type Declarations
     using PriceConverter for uint256;
 
     uint256 public constant MINIMUM_USD = 50 * 1e18; // 1 * 10 * 18
@@ -20,6 +27,8 @@ contract FundMe {
 
     // Keeping track of people who send money
     address[] public funders;
+    
+    // State Variables
     mapping(address => uint256) public addressToAmountFunded;
 
     address public immutable owner;
@@ -28,15 +37,31 @@ contract FundMe {
     // 23,644 - non immutable
 
     AggregatorV3Interface private priceFeed; 
+
+    modifier onlyOwner() {
+        // require(msg.sender == i_owner, "Sender is not owner!");
+        if(msg.sender == owner) {revert  FundMe__NotOwner();}
+        // doing the rest of the code
+        _;
+    }
  
     constructor(address priceFeedAddress) {
         owner = msg.sender;
         priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
-    // constructor() {
-    //     i_owner = msg.sender;
-    // }
+    receive() external payable{
+        fund();
+    }
+
+    fallback() external payable{
+        fund();
+    }
+
+    /**
+     *  @notice This function funds this contract
+     *  @dev This implements price feed as our library
+     */
 
     function fund() public payable {
         require(
@@ -78,20 +103,6 @@ contract FundMe {
         revert();
     }
 
-    modifier onlyOwner() {
-        // require(msg.sender == i_owner, "Sender is not owner!");
-        if(msg.sender == owner) {revert NotOwner();}
-        // doing the rest of the code
-        _;
-    }
-    // What happens if someone sends this contract ETH without call the fun funding
 
-    receive() external payable{
-        fund();
-    }
-
-    fallback() external payable{
-        fund();
-    }
 
 }
