@@ -49,4 +49,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         "-----------------------------------------------------------------------------------"
     )
 }
-module.exports.tags = ["ethUsdPriceFeedAddress"]
+module.exports.tags = ["all","fundme"]

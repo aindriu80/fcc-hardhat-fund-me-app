@@ -36,7 +36,7 @@ contract FundMe {
     // 21,508 gas - immutable
     // 23,644 - non immutable
 
-    AggregatorV3Interface private priceFeed; 
+    AggregatorV3Interface public priceFeed; 
 
     modifier onlyOwner() {
         // require(msg.sender == i_owner, "Sender is not owner!");
