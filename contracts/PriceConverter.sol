@@ -17,12 +17,12 @@ library PriceConverter {
         return uint256(price * 1e10); // 1**10 = 10000000000
     }
 
-    function getVersion() internal view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(
-            0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
-        );
-        return priceFeed.version();
-    }
+    // function getVersion() internal view returns (uint256) {
+    //     AggregatorV3Interface priceFeed = AggregatorV3Interface(
+    //         0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+    //     );
+    //     return priceFeed.version();
+    // }
 
     function getConversionRate(
         uint256 ethAmount,

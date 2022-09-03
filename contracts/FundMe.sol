@@ -1,4 +1,4 @@
-// SPDX-Licence-Identifier: MIT
+// SPDX-License-Identifier: MIT
 // Pragma
 pragma solidity ^0.8.8;
 // Imports
@@ -50,13 +50,13 @@ contract FundMe {
         priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
-    receive() external payable{
-        fund();
-    }
+    // receive() external payable{
+    //     fund();
+    // }
 
-    fallback() external payable{
-        fund();
-    }
+    // fallback() external payable{
+    //     fund();
+    // }
 
     /**
      *  @notice This function funds this contract
@@ -99,8 +99,7 @@ contract FundMe {
         (bool callSuccess, ) = payable(msg.sender).call{
             value: address(this).balance
         }("");
-        require(callSuccess, "Call Failed");
-        revert();
+        require(callSuccess, "Transfer Failed");
     }
 
 
