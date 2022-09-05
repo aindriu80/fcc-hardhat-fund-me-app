@@ -29,9 +29,13 @@ contract FundMe {
     address[] public funders;
     
     // State Variables
-    mapping(address => uint256) public addressToAmountFunded;
+    // mapping(address => uint256) public addressToAmountFunded;
+   mapping(address => uint256) private s_addressToAmountFunded;
+   
+    address private immutable i_owner;
+    address[] private s_funders;
 
-    address public immutable owner;
+    // address public immutable owner;
 
     // 21,508 gas - immutable
     // 23,644 - non immutable
@@ -40,13 +44,13 @@ contract FundMe {
 
     modifier onlyOwner() {
         // require(msg.sender == i_owner, "Sender is not owner!");
-        if(msg.sender == owner) {revert  FundMe__NotOwner();}
+        if(msg.sender != i_owner) revert FundMe__NotOwner();
         // doing the rest of the code
         _;
     }
  
     constructor(address priceFeedAddress) {
-        owner = msg.sender;
+        i_owner = msg.sender;
         priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
@@ -69,17 +73,34 @@ contract FundMe {
             "Didn't send enough!"
         );
         funders.push(msg.sender);
-        addressToAmountFunded[msg.sender] = msg.value;
+        s_addressToAmountFunded[msg.sender] = msg.value;
     }
 
-    function withdraw() public {
+    function withdraw() public onlyOwner {
+        for (
+            uint256 funderIndex = 0;
+            funderIndex < s_funders.length;
+            funderIndex++
+        ) {
+            address funder = s_funders[funderIndex];
+            s_addressToAmountFunded[funder] = 0;
+        }
+        s_funders = new address[](0);
+        // Transfer vs call vs Send
+        // payable(msg.sender).transfer(address(this).balance);
+        (bool success, ) = i_owner.call{value: address(this).balance}("");
+        require(success);
+    }
+
+
+    function cheaperWithdraw() public onlyOwner{
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
             funderIndex++
         ) {
             address funder = funders[funderIndex];
-            addressToAmountFunded[funder] = 0;
+            s_addressToAmountFunded[funder] = 0;
         }
 
         //  reset the array
@@ -101,7 +122,7 @@ contract FundMe {
         }("");
         require(callSuccess, "Transfer Failed");
     }
-
-
-
 }
+
+
+
