@@ -27,25 +27,27 @@ describe("FundMe", async function() {
         })
     })
 
-    describe("fund", async function() {
-        it("Fails if you don't send enough ETH", async function() {
+    describe("fund", async function () {
+        it("Fails if you don't send enough ETH", async function () {
             await expect(fundMe.fund()).to.be.revertedWith(
                 "Didn't send enough!"
             )
         })
-        it("updated the amount funded data structure", async function() {
+        it("updated the amount funded data structure", async function () {
             await fundMe.fund({ value: sendValue })
-            const response = await fundMe.addressToAmountFunded(deployer)
+            const response = await fundMe.s_addressToAmountFunded(deployer)
+            // const response = await fundMe.priceFeed()
             assert.equal(response.toString(), sendValue.toString())
+            // assert.equal(response, mockV3Aggregator.address)
         })
-        it("Adds funder to array of funders", async function() {
+        it("Adds funder to array of funders", async function () {
             await fundMe.fund({ value: sendValue })
             const funder = await fundMe.funders(0)
             assert.equal(funder, deployer)
         })
     })
-    describe("withdraw", async function() {
-        beforeEach(async function() {
+    describe("withdraw", async function () {
+        beforeEach(async function () {
             await fundMe.fund({ value: sendValue })
         })
         it("Withdraw ETH from a single founder", async function () {
@@ -80,7 +82,7 @@ describe("FundMe", async function() {
         it("allows us to withdraw with multiple funders", async function () {
             // Arrange
             const accounts = await ethers.getSigners()
-            for (let i = 1; i < 6; i++) {
+            for (let i = 0; i < 6; i++) {
                 const fundMeConnectedContract = await fundMe.connect(
                     accounts[i]
                 )
@@ -110,7 +112,8 @@ describe("FundMe", async function() {
             )
             assert.equal(endingFundMeBalance, 0)
             assert.equal(
-                startingFundMeBalance.add(startingDeployerBalance),
+                startingDeployerBalance.add(startingFundMeBalance).toString(),
+                // startingFundMeBalance.add(startingDeployerBalance),
                 endingDeployerBalance.add(gasCost).toString()
             )
 
@@ -119,7 +122,7 @@ describe("FundMe", async function() {
 
             for (i = 1; i < 6; i++) {
                 assert.equal(
-                    await fundMe.addressToAmountFunded(accounts[i].address),
+                    await fundMe.s_addressToAmountFunded(accounts[i].address),
                     0
                 )
             }
@@ -132,6 +135,7 @@ describe("FundMe", async function() {
             await expect(
                 attackerConnectedContract.withdraw()
             ).to.be.revertedWith("FundMe__NotOwner")
+            // ).to.be.revertedWithCustomError(fundMe, "FundMe__NotOwner")
         })
     })
 })

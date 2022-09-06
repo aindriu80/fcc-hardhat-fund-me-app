@@ -30,10 +30,10 @@ contract FundMe {
     
     // State Variables
     // mapping(address => uint256) public addressToAmountFunded;
-   mapping(address => uint256) private s_addressToAmountFunded;
+   mapping(address => uint256) public s_addressToAmountFunded;
    
-    address private immutable i_owner;
-    address[] private s_funders;
+    address public immutable i_owner;
+    address[] public s_funders;
 
     // address public immutable owner;
 
@@ -122,6 +122,7 @@ contract FundMe {
         }("");
         require(callSuccess, "Transfer Failed");
     }
+    
 }
 
 
