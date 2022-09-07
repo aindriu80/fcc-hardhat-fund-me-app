@@ -2,12 +2,11 @@
 // Pragma
 pragma solidity ^0.8.8;
 // Imports
-import "./PriceConverter.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "./PriceConverter.sol";
 
 // Error codes
 error FundMe__NotOwner();
-
 //  Interfaces, Libraries, Contracts
 
 /** @title A contract for crowd funding
@@ -32,8 +31,8 @@ contract FundMe {
     // mapping(address => uint256) public addressToAmountFunded;
    mapping(address => uint256) public s_addressToAmountFunded;
    
-    address public immutable i_owner;
-    address[] public s_funders;
+    address  private immutable i_owner;
+    address[] private s_funders;
 
     // address public immutable owner;
 
@@ -50,8 +49,8 @@ contract FundMe {
     }
  
     constructor(address priceFeedAddress) {
-        i_owner = msg.sender;
         priceFeed = AggregatorV3Interface(priceFeedAddress);
+        i_owner = msg.sender;
     }
 
     // receive() external payable{
@@ -74,6 +73,7 @@ contract FundMe {
         );
         funders.push(msg.sender);
         s_addressToAmountFunded[msg.sender] = msg.value;
+        s_funders.push(msg.sender);
     }
 
     function withdraw() public onlyOwner {
@@ -122,7 +122,24 @@ contract FundMe {
         }("");
         require(callSuccess, "Transfer Failed");
     }
+      function getAddressToAmountFunded(address fundingAddress)
+        public
+        view
+        returns (uint256)
+    {
+        return s_addressToAmountFunded[fundingAddress];
+    }
     
+
+    function getFunder(uint256 index) public view returns (address) {
+        return s_funders[index];
+    }
+
+    function getOwner() public view returns (address) {
+        return i_owner;
+    }
+
+   
 }
 
 
