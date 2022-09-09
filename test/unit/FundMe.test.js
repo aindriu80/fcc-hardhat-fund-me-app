@@ -40,9 +40,9 @@ describe("FundMe", async function() {
             assert.equal(response.toString(), sendValue.toString())
             // assert.equal(response, mockV3Aggregator.address)
         })
-        it("Adds funder to array of funders", async function() {
+        it("Adds funder to array of s_funders", async function() {
             await fundMe.fund({ value: sendValue })
-            const funder = await fundMe.funders(0)
+            const funder = await fundMe.getFunder(0)
             assert.equal(funder, deployer)
         })
     })
@@ -79,7 +79,37 @@ describe("FundMe", async function() {
                 endingDeployerBalance.add(gasCost).toString()
             )
         })
-        it("allows us to withdraw with multiple funders", async function() {
+        it("Withdraw ETH from a single founder", async function() {
+            // Arrange
+            const startingFundMeBalance = await fundMe.provider.getBalance(
+                fundMe.address
+            )
+
+            const startingDeployerBalance = await fundMe.provider.getBalance(
+                deployer
+            )
+            // Act
+            const transactionResponse = await fundMe.cheaperWithdraw()
+            const transactionReceipt = await transactionResponse.wait(1)
+            const { gasUsed, effectiveGasPrice } = transactionReceipt
+            const gasCost = gasUsed.mul(effectiveGasPrice)
+
+            const endingFundMeBalance = await fundMe.provider.getBalance(
+                fundMe.address
+            )
+            const endingDeployerBalance = await fundMe.provider.getBalance(
+                deployer
+            )
+
+            // Assert
+            // assert.equal(endingFundMeBalance, 0)
+            assert.equal(
+                startingFundMeBalance.add(startingDeployerBalance),
+                endingDeployerBalance.add(gasCost).toString()
+            )
+        })
+
+        it("allows us to withdraw with multiple s_funders", async function() {
             // Arrange
             const accounts = await ethers.getSigners()
             for (let i = 0; i < 6; i++) {

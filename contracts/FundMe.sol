@@ -25,7 +25,7 @@ contract FundMe {
     // 23,515 * 141000000000 = $9.946845
 
     // Keeping track of people who send money
-    address[] public funders;
+    // address[] public funders;
     
     // State Variables
     // mapping(address => uint256) public addressToAmountFunded;
@@ -71,7 +71,6 @@ contract FundMe {
             msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
             "Didn't send enough!"
         );
-        funders.push(msg.sender);
         s_addressToAmountFunded[msg.sender] = msg.value;
         s_funders.push(msg.sender);
     }
@@ -94,6 +93,8 @@ contract FundMe {
 
 
     function cheaperWithdraw() public onlyOwner{
+        address[] memory funders = s_funders;
+        // mappings can't be in memory, 
         for (
             uint256 funderIndex = 0;
             funderIndex < funders.length;
@@ -104,17 +105,8 @@ contract FundMe {
         }
 
         //  reset the array
-        funders = new address[](0);
+        s_funders = new address[](0);
 
-        //  need to actually withdraw funds - 3 different ways: transfer, send, call
-        // Transfer - the 3 methods
-
-        // // payable(msg.sender) = payable adress
-        // payable(msg.sender).transfer(address(this).balance);
-
-        // // Send
-        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
-        // require(sendSuccess, "Send Failed");
 
         // Call
         (bool callSuccess, ) = payable(msg.sender).call{
