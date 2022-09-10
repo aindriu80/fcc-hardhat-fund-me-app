@@ -22,7 +22,7 @@ describe("FundMe", async function() {
 
     describe("constructor", async function() {
         it("Sets the aggregator addresses correctly", async function() {
-            const response = await fundMe.priceFeed()
+            const response = await fundMe.getPriceFeed()
             assert.equal(response, mockV3Aggregator.address)
         })
     })
